@@ -3,89 +3,40 @@ from tkinter import*
 import winsound
 import time
 from random import random, randrange,choice
-WIDTH=1000
-HEIGHT=700
-x=0
-y=4
+import os
 root=Tk()
-canvas=Canvas(root,width=WIDTH,height=HEIGHT)
-canvas.pack()
+root.geometry('1000x700')
 frame=Frame()
 frame.master.title("Space shooting game")
+canvas=Canvas(frame)
 
 # !====================================== Set defult background =================================
 welcome_img=PhotoImage(file='img/background.png')
 menu_background=canvas.create_image(0,0,image=welcome_img,anchor=NW)
-
 # !====================================== Game introduction (1st window) =================================
-def open_game():
-    canvas.create_text(500,100,text='Welcome to space shooting game',fill='yellow', font=('Purisa',40,'bold'))
+# def open_game():
+#     canvas.create_text(500,100,text='Welcome to space shooting game',fill='yellow', font=('Purisa',40,'bold'))
 
-    canvas.create_rectangle(150,180,850,500,fill='cyan',outline='white')
-    canvas.create_text(350,220,text='How to play:',fill='blue', font=('Purisa',35,'bold'))
+#     canvas.create_rectangle(150,180,850,500,fill='cyan',outline='white')
+#     canvas.create_text(350,220,text='How to play:',fill='blue', font=('Purisa',35,'bold'))
 
-    canvas.create_text(500,350,text="You can use arrow key to move the game" +'\n'"and 's' key to shoot the anime"+'\n'+"You have only 3 minutes to play"+'\n'+"- You win when you still alive in 3 minute"+'\n'+"- You lose if you death before 3 minute come",fill='blue', font=('Purisa',25))
+#     canvas.create_text(500,350,text="You can use arrow key to move the game" +'\n'"and 's' key to shoot the anime"+'\n'+"You have only 3 minutes to play"+'\n'+"- You win when you still alive in 3 minute"+'\n'+"- You lose if you death before 3 minute come",fill='blue', font=('Purisa',25))
    
-    canvas.create_oval(400,500,600,700,fill='cyan',outline='yellow')
-    canvas.create_text(500,600,text="Start play",font=("",30,'bold'),fill='purple')
+#     canvas.create_oval(400,500,600,700,fill='cyan',outline='yellow',tags='start')
+#     canvas.create_text(500,600,text="Start play",font=("",30,'bold'),fill='purple')
         
-    winsound.PlaySound('sound/welcome.wav',winsound.SND_FILENAME|winsound.SND_ASYNC)
-
-
+#     winsound.PlaySound('sound/welcome.wav',winsound.SND_FILENAME|winsound.SND_ASYNC)
 # !(PART-2)====================================== Main part (play part) =================================
 shooter_pos_x=500
 shooter_pos_y=500
 score=0
-click=0
-times=0
-# !------------- main function----------------
-def start_game():
-    global simple,medium,special,an_bul_check,my_shooter
-    canvas.delete('all')
-    canvas.create_image(0,0,image=welcome_img,anchor=NW)
-    my_shooter=canvas.create_image(shooter_pos_x,shooter_pos_y,image=fighter,anchor=NW)
-
-                    # !=================create anime and move==================
-    def create_anime():
-        # !............... simple anime ...................
-        simple_an_1=PhotoImage(file='img/simple_anime.png')
-        simple1=canvas.create_image(randrange(5,100),0,image=simple_an_1)
-
-        simple_an_2=PhotoImage(file='img/simple_anime.png')
-        simple2=canvas.create_image(randrange(300,800),0,image=simple_an_2)
-
-        simple_an_3=PhotoImage(file='img/simple_anime.png')
-        simple3=canvas.create_image(randrange(100,600),0,image=simple_an_3)
-
-        simple_an_4=PhotoImage(file='img/simple_anime.png')
-        simple4=canvas.create_image(randrange(40,300),0,image=simple_an_4)
-
-        simple_an_5=PhotoImage(file='img/simple_anime.png')
-        simple5=canvas.create_image(randrange(1,700),0,image=simple_an_5)
-
-        # !...............  medium anime ...................
-        medium_an_1=PhotoImage(file='img/medium.png')
-        medium1=canvas.create_image(randrange(200,900),0,image=medium_an_1)
-
-        medium_an_2=PhotoImage(file='img/medium.png')
-        medium2=canvas.create_image(randrange(200,900),0,image=medium_an_2)
-
-        # !................... move anime.......................
-        while True:
-            canvas.move(simple1,0,5)
-            canvas.move(simple2,0,6)
-            canvas.move(simple3,0,9)
-            canvas.move(simple4,0,8)
-            canvas.move(simple5,0,7)
-            canvas.move(medium1,0,3)
-            canvas.move(medium2,0,4)
-    
-            root.update()
-            time.sleep(0.01)
-    create_anime()
-# !..............create bullets............
-winsound.PlaySound('sound/play.wav',winsound.SND_FILENAME|winsound.SND_ASYNC)
+p_bul_list=[]
+an_bul_list=[]
+an_list=[]
+# !(part-1/2)=============================create shooter,shooter bullet,move it =================================
+# !.......................create shooter.............................
 fighter=PhotoImage(file='img/shooter1.png')
+my_shooter=canvas.create_image(shooter_pos_x,shooter_pos_y,image=fighter,anchor=NW)
 
 #! ................... move shooter to the left......................
 def move_shooter_l(event):
@@ -100,84 +51,79 @@ def move_shooter_r(event):
         shooter_pos_x +=25
         canvas.moveto(my_shooter,shooter_pos_x,shooter_pos_y)
 
-# !................... move the shooter up......................
+# !................... ....move the shooter up........................
 def move_shooter_u(event):
     global shooter_pos_y,my_shooter
     if shooter_pos_y >0:
         shooter_pos_y -=25
         canvas.moveto(my_shooter,shooter_pos_x,shooter_pos_y)
 
-# !................... move the shooter down......................
+# !................... ....move the shooter down......................
 def move_shooter_d(event):
     global shooter_pos_y,my_shooter
     if shooter_pos_y<500:
         shooter_pos_y +=25
         canvas.moveto(my_shooter,shooter_pos_x,shooter_pos_y)
 
-# !.............create shooter bullets................
+# !.........................create shooter bullets....................
 p_bul_img=PhotoImage(file='img/p_bullet.png')
-def create_p_bullets():
-    global p_bullet,shooter_pos_x,shooter_pos_y
-    canvas.after(2000,lambda:create_p_bullets())
+def create_p_bullets(event):
+    canvas.delete('p_bullet')
+    global p_bullet,shooter_pos_x,shooter_pos_y,p_bul_list
     p_bullet=canvas.create_image(shooter_pos_x+20,shooter_pos_y-60,image=p_bul_img,anchor=NW)
+    p_bul_list.append(p_bullet)
     while True:
         canvas.move(p_bullet,0,-8)
         root.update()
-        time.sleep(0.01)
-
-#! ...........................create special anime and it's bullet.........................
-an_bul=PhotoImage(file='img/an_bullet.png')
-def create_an_bullets():
-    global an_bullet,an_bul_check,special
-    special_an=PhotoImage(file='img/special_anime.png')
-    special=canvas.create_image(randrange(100,800),2,image=special_an)
-
-    should_an_bul_pos=canvas.coords(special)
-
-    an_bul=PhotoImage(file='img/an_bullet.png')
-    an_bullet=canvas.create_image(should_an_bul_pos[0],should_an_bul_pos[1],image=an_bul)
-    canvas.after(4000,lambda:create_an_bullets())
-    while True:
-        canvas.move(special,0,5)
-        canvas.move(an_bullet,0,8)
+        time.sleep(0.01) 
+# !(part-2/2)====================================== create anime,anime bullet and move them =================================
+# !................Create anime...................
+def create_anime():
+    global simple_an,simple_img
+    simple_img=PhotoImage(file='img/simple_anime.png')
+    simple_an=canvas.create_image(randrange(5,100),2,image=simple_img)
+    an_list.append(simple_an)
+def move_an():
+    an_pos=create_anime()
+    an_bul_pos=canvas.coords(an_pos)
+    if an_bul_pos[1]>600:
+        canvas.move(simple_an,0,6)
         root.update()
-        time.sleep(0.01)
+        time.sleep(0.01) 
+# move_an()
 # !....................check anime bullet meet the shooter or not..................
-def an_bul_meet_shooter():
-    should_an_bul_pos=canvas.coords(special)
-    if should_an_bul_pos[0]==shooter_pos_x and should_an_bul_pos[1]==shooter_pos_y:
-        canvas.delete(fighter)
-        end_game()
-# !(PART-3)====================================== Finish game (after end game interface) =================================
-def end_game():
-    global score
-    canvas.create_oval(540,100,800,250,fill='MAGENTA',outline='yellow',tags='start')
-    canvas.create_text(675,180,text=score,font=("",30,'bold'),fill='white')
-    canvas.create_text(670,280,text='Your scores!',font=("",30,'bold'),fill='white')
-    def play_again():
-        canvas.create_rectangle(200,500,500,600,fill='purple',outline='yellow',tags='play')
-        canvas.create_text(350,550,text='Play again',font=("",30,'bold'),fill='white')
-    play_again()
 
-    def exit_game():
-        canvas.create_rectangle(850,500,1150,600,fill='purple',outline='yellow',tags='leave')
-        canvas.create_text(1000,550,text='Exit game',font=("",30,'bold'),fill='white')
-    exit_game()
+
+# !(PART-3)====================================== Finish game (after end game interface) =================================
+# !...............Replay the game....................
+def play_again():
+    root.destroy()
+    os.system('python game.py')
+
+#! ..................Exit game.............
+def stop_game():
+    root.destroy()
+def end_game():
     winsound.PlaySound('sound/endG.wav',winsound.SND_FILENAME|winsound.SND_ASYNC)
+    canvas.create_oval(450,100,710,250,fill='MAGENTA',outline='yellow',tags='start')
+    canvas.create_text(580,180,text=score,font=("",30,'bold'),fill='white')
+    canvas.create_text(600,280,text='Your scores!',font=("",30,'bold'),fill='white')
+    replay=Button(text='Play again',font=('',30),command=play_again,bg='pink',fg='black')
+    stop=Button(text='Exit game',font=('',30),command=stop_game,bg='cyan',fg='black')
+    replay.pack(padx=20,pady=20)
+    stop.pack(padx=20,pady=20)
+    replay.place(x=250,y=450)
+    stop.place(x=650,y=450)
 
 # !====================================== Check condition to display all above parts =================================
-if click==0:
-    open_game()
-elif click==1:
-    start_game()
-elif click==times:
-    end_game()
-    
-root.bind('<u>',move_shooter_u)
-root.bind('<d>',move_shooter_d)
-root.bind('<l>',move_shooter_l)
-root.bind('<r>',move_shooter_r)
 
+# !..................all event parts...............
+# canvas.tag_bind('start','<Button-1>',click_on_start)
+root.bind('<Up>',move_shooter_u)
+root.bind('<Down>',move_shooter_d)
+root.bind('<Left>',move_shooter_l)
+root.bind('<Right>',move_shooter_r)
+root.bind('<s>',create_p_bullets)
 
 frame.pack(expand=True,fill='both')
 canvas.pack(expand=True,fill='both')
