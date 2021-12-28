@@ -61,6 +61,7 @@ def draw_grid():
         # !======================================= Defult sound===============================
         canvas.delete("all")
         winsound.PlaySound('sound/fireball.wav',winsound.SND_FILENAME|winsound.SND_ASYNC)
+        canvas.create_window(200,610,window=button_check)
         global score
         isTrue=True
         for row in range(len(grid)):
