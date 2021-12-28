@@ -58,10 +58,8 @@ def draw_grid():
 # !======================================Move mario===============================
 
     def move(direction):
-        # !======================================= Defult sound===============================
         canvas.delete("all")
         winsound.PlaySound('sound/fireball.wav',winsound.SND_FILENAME|winsound.SND_ASYNC)
-        canvas.create_window(200,610,window=button_check)
         global score
         isTrue=True
         for row in range(len(grid)):
@@ -114,6 +112,7 @@ def draw_grid():
         move('up')
     def move_down(e):
         move('down')
+# !======================================= end game feature==========================
 def win():
     global button_exit,button_replay
     canvas.create_text(500,400,text="YOU WIN !",font=("",25,"bold"),fill="white")
@@ -128,6 +127,7 @@ def exit():
 def check_button():
     canvas.create_window(100,500,window=button_exit)
     canvas.create_window(900,500,window=button_replay)
+
 # !================================== Create window==============================    
 from tkinter import*
 import winsound
